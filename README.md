@@ -1,23 +1,79 @@
-# HOI4 Modding Tools Extension
-<img src="./images/documentation1.png" alt="Logo" width="900">
-<img src="./images/documentation2.png" alt="Logo" width="900">
-<img src="./images/documentation3.png" alt="Logo" width="900">
-<img src="./images/documentation4.png" alt="Logo" width="900">
-<img src="./images/documentation5.png" alt="Logo" width="900">
-<img src="./images/FocusTree.png" alt="Logo" width="900">
-
-# HOI4 Modding Tools
-
-A new Visual Studio Code extension for Hearts of Iron IV mod development, focused on ease of use, orchestration, and assisting the mod community and mod teams with a modern HOI4 modding toolset with multiple functions and uses.
-
 # HOI4 Modding Tools for VS Code
 
-A comprehensive Visual Studio Code extension for Hearts of Iron IV mod development. This extension provides a complete suite of visual editors, analyzers, and productivity tools for creating professional HOI4 mods.
+A Visual Studio Code extension for Hearts of Iron IV mod development: visual
+editors for the things that are painful to write by hand, analysers for the
+things that are painful to check by hand, and a 236-tool MCP server so an AI
+assistant can drive the same toolset you do.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![HOI4](https://img.shields.io/badge/HOI4-1.14+-green)
+![Version](https://img.shields.io/badge/version-2.36.1-blue)
+![HOI4](https://img.shields.io/badge/HOI4-1.19.x-green)
 ![VS Code](https://img.shields.io/badge/VS%20Code-1.85+-purple)
 ![License](https://img.shields.io/badge/license-MIT-orange)
+
+**129 commands · 24 keybindings · 42 settings · 236 MCP tools**
+
+---
+
+## Scripted GUI Creator
+
+Draw the panel, wire the buttons, press Save. The editor writes all four files a
+scripted GUI actually lives in and keeps them consistent with each other.
+
+<img src="./images/gui-creator-canvas.png" alt="Scripted GUI Creator: canvas, layers, window settings and live generated .gui" width="900">
+
+*The canvas, with window tabs across the top (main window, modal, entry
+template), the element palette on the left, window and scripted-GUI settings on
+the right, and the generated `.gui` updating live at the bottom.*
+
+<img src="./images/gui-creator-element.png" alt="A selected button showing its click effect, enabled trigger and tooltip" width="900">
+
+*Select an element and the right-hand panel becomes its bindings: click effect,
+right-click effect, click-enabled trigger, per-element visible trigger, tooltip.
+The `scripted_gui` tab at the bottom shows what those bindings compile to.*
+
+<img src="./images/gui-creator-mapimage.png" alt="Render Map Image: a country silhouette rendered from the map and added to the GUI" width="900">
+
+*The **Render Map Image** sub-tool turns any state, country or continent into a
+sprite straight from `provinces.bmp`. Pick it from the list, set fill and
+outline, and it becomes a clickable button on your canvas with the state-scoped
+checks already scaffolded. (The silhouette shown is vanilla GER at 260×167, from
+264×168 map pixels.)*
+
+<img src="./images/gui-creator-export.png" alt="Export preview showing the four files and their diffs before writing" width="900">
+
+*Save shows you the diff first: the `.gui` window, the `scripted_gui` entry, the
+localisation keys and the `.gfx` sprite entries, with a `.bak` of anything it
+overwrites.*
+
+---
+
+## Other tools
+
+<img src="./images/FocusTree.png" alt="Focus Tree Editor" width="900">
+
+*Focus Tree Editor: drag focuses, draw prerequisites, edit properties in place.*
+
+<img src="./images/documentation1.png" alt="Dependency Graph" width="900">
+
+*Dependency Graph: every definition in the mod by type, what depends on a given
+flag, and what breaks if you change it.*
+
+<img src="./images/documentation4.png" alt="Hover preview showing scope, localisation and definitions" width="900">
+
+*Hover anything (a flag, an event id, a loc key) for its context scope, its
+localised text and every file that references it, all click-through.*
+
+<img src="./images/documentation2.png" alt="Event Picture Creator and inline event previews" width="900">
+
+*Event Picture Creator (drop an image, get a correctly sized DDS and the
+`picture = GFX_…` line) alongside inline `.dds` previews and a one-click
+**Create** for a sprite the event references but nothing defines.*
+
+<img src="./images/documentation3.png" alt="HOI4 error.log ingested into the Problems panel" width="900">
+
+*The game's own `error.log` ingested into the Problems panel next to Clausewitz
+validation, every entry click-through to the line that caused it. Launch HOI4
+with `-debug` to get the log.*
 
 ---
 
@@ -25,6 +81,7 @@ A comprehensive Visual Studio Code extension for Hearts of Iron IV mod developme
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
+- [Scripted GUI Creator: Guide](#scripted-gui-creator-guide) (how-tos)
 - [Visual Editors](#visual-editors)
 - [Analysis Tools](#analysis-tools)
 - [Content Browsers](#content-browsers)
@@ -32,9 +89,13 @@ A comprehensive Visual Studio Code extension for Hearts of Iron IV mod developme
 - [Localization Tools](#localization-tools)
 - [Development Tools](#development-tools)
 - [Search and Navigation](#search-and-navigation)
+- [Map Tools](#map-tools)
+- [HOI4 Git](#hoi4-git)
+- [AI Assistant Support (MCP)](#ai-assistant-support-mcp)
 - [Keyboard Shortcuts](#keyboard-shortcuts)
 - [Configuration](#configuration)
 - [Troubleshooting](#troubleshooting)
+- [Expected Mod Structure](#expected-mod-structure)
 - [Contributing](#contributing)
 
 ---
@@ -43,22 +104,226 @@ A comprehensive Visual Studio Code extension for Hearts of Iron IV mod developme
 
 ### From VSIX File (Recommended)
 
-1. Download the latest `.vsix` file from [Releases](https://github.com/your-repo/hoi4-modding-tools/releases)
+1. Download the latest `.vsix` from [Releases](https://github.com/OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC/releases)
 2. Open VS Code
-3. Press `Ctrl+Shift+P` and type **Install from VSIX**
+3. Press `Ctrl+Shift+P` and run **Extensions: Install from VSIX**
 4. Select the downloaded file
 5. Reload VS Code when prompted
 
+### From the Marketplace
 
+Search **HOI4 Modding Tools** in the Extensions view, or install
+[UC-ModdingUtilities.hoi4-modding-tools](https://marketplace.visualstudio.com/items?itemName=UC-ModdingUtilities.hoi4-modding-tools).
+
+### Optional: ffmpeg, for animated DDS and audio tools
+
+A few tools shell out to `ffmpeg`. On Windows, download it, copy `bin` to
+`C:\ffmpeg`, and add `C:\ffmpeg\bin` to your PATH, then relaunch VS Code:
+
+<img src="./images/documentation5.png" alt="Adding ffmpeg to the Windows PATH" width="900">
+
+### Optional: point it at your game install
+
+Several features read the base game: preview backdrops with real textures,
+vanilla window overrides, debug log watching. Set `hoi4.gamePath` in settings to
+your Hearts of Iron IV directory to enable them.
 
 ---
 
 ## Quick Start
 
-1. **Open your mod folder** in VS Code (File > Open Folder)
-2. Look for the **Shield icon** in the Activity Bar (left sidebar)
-3. Click it to reveal all tools organized by category
-4. Start with **Welcome / Help** for an interactive guide
+1. **Open your mod folder** in VS Code (File → Open Folder)
+2. Click the **shield icon** in the Activity Bar to reveal every tool by category
+3. Start with **Welcome / Help** for an interactive guide
+4. Or jump straight in: `Ctrl+Shift+P` → **HOI4: Scripted GUI Creator**
+
+---
+
+## Scripted GUI Creator: Guide
+
+`Ctrl+Shift+P` → **HOI4: Scripted GUI Creator**
+
+A scripted GUI is not one file. It is a `containerWindowType` in `interface/*.gui`,
+a `scripted_gui` entry in `common/scripted_guis/*.txt` that binds its buttons to
+effects, localisation keys for every label, and `.gfx` entries for every sprite:
+four files that have to agree on every name, in a language where a misspelt
+binding fails silently in game. The creator's job is to keep them in agreement.
+
+### The interface
+
+| Region | What it does |
+|---|---|
+| **Toolbar** | Element tools, undo/redo, clipboard, layer order, grid/snap/guides, **Links** overlay, **Preview**, **Check**, zoom, **GFX** browser, **Tpl** templates, **Import**, **Save** |
+| **Window tabs** | The main window, every modal, and every entry template edit on their own canvas |
+| **Add Elements** | Container, Button, Icon, Text Box, Checkbox, List Box, Grid Box, Edit Box, Overlapping Box, Progress Bar, **State Image** (opens Render Map Image) |
+| **Sub-menus** | `+ Sub-menu (in-window)` and `+ Modal Window` build an opener button and its panel in one click |
+| **Layers** | The element tree: drag to move or reparent, filter by name or type |
+| **Properties** | Window settings and scripted-GUI settings with nothing selected; that element's bindings with something selected |
+| **Code panel** | `.gui File` · `scripted_gui` · `Localization` · `GFX Entries`: the real output, updating as you edit |
+
+### How-to: build a panel from scratch
+
+1. **Name the window.** With nothing selected, set **GUI Name** and **Window
+   Size** in Properties. That name becomes the `containerWindowType`, the
+   `scripted_gui` key and the filenames.
+2. **Drop a background.** `+ Container`, then set its **Sprite**, or click the
+   `...` button to browse every sprite the mod and game define.
+3. **Add your elements.** Click a palette entry, then click the canvas. Grid and
+   Snap are on by default; the step is set by the `10px` dropdown.
+4. **Parent them.** Drag elements onto a container in the **Layers** tree, or set
+   **Parent Container** in Properties. Children follow a moved parent.
+5. **Align.** Select several elements and use the alignment row: edges, centres,
+   equal widths and heights.
+6. **Check.** The **Check** button audits the whole GUI: duplicate or invalid
+   names, elements outside the window, sprites defined in no `.gfx`, dynamic
+   lists with no entry container, slot-size mistakes, script errors. Every
+   finding is click-to-select.
+7. **Save.** You get the export preview above: four files, line counts, full
+   diffs. Nothing is written until you press **Write files**, and anything
+   overwritten is backed up to `.vscode/gui_backups`.
+
+### How-to: wire a button to an effect
+
+Select the button. The Properties panel becomes its bindings:
+
+- **Click Effect**: Clausewitz script, e.g. `add_to_variable = { council_funding = 1 }`
+- **Right-Click Effect**: optional second binding
+- **Click Enabled Trigger**: when the button is clickable, e.g. `has_political_power > 50`
+- **Visible Trigger**: per-element visibility, independent of the window's
+- **Tooltip**: a localisation key, written to the loc file for you
+
+The creator derives the block names the game expects (`<btn>_click`,
+`<btn>_click_enabled`, `<el>_visible`) so you never type a suffix. Every script
+box validates as you type: unbalanced braces, unknown effect and trigger names
+against a 240-entry database. It also autocompletes effect names with syntax
+hints (Tab or Enter to accept).
+
+The **fx math** link next to each effect box compiles an infix formula into
+`set_variable` script through the 1.19.x math engine, so
+`(oil / max_oil) * 100` becomes valid script without you writing the temp
+variables by hand.
+
+### How-to: a dynamic list
+
+1. `+ Grid Box (list)` and place it.
+2. Set **List Array** to the array the scripted GUI fills, e.g. `council_projects`.
+3. Press **Create Entry Template**. You get a new canvas tab for one row.
+4. Design the row. Use `[?council_projects^i]` in a text element to show the
+   current entry.
+5. Back on the main tab, the gridbox's **Entry Container** is already pointed at
+   the template, and the template exports as its own top-level
+   `containerWindowType`. Preview tiles sample rows so the list looks real
+   before the game loads it.
+
+### How-to: render a state, country or continent as a clickable image
+
+The **+ State Image** palette entry opens **Render Map Image**, the sub-tool
+that turns map geography into GUI sprites, so a "pick your region" panel does not
+mean hand-tracing shapes in an image editor.
+
+1. **Choose what you are rendering** with the dropdown: **States**,
+   **Countries** or **Continents**. The list rebuilds from your mod's
+   `provinces.bmp`, `definition.csv` and state files: states by id, name and
+   owner; countries by tag with their state count and political colour;
+   continents by index and province count. The options on the right change with
+   the mode, because they are not all meaningful for every shape:
+
+<img src="./images/gui-creator-mapimage-state.png" alt="States mode: a single state rendered from the map" width="900">
+
+***States:*** *all 1,081 of them by name, id and owner, with* **Combine
+multiple states** *offered here and nowhere else. Sicily at 260×159, from 48×29
+map pixels.*
+
+<img src="./images/gui-creator-mapimage-continent.png" alt="Continents mode: a whole continent rendered from the map" width="900">
+
+***Continents:*** *the whole landmass, with* **Divide into clickable states**
+*offered for continents and countries. Europe at 260×175, from 1226×820 map
+pixels. (Continents are listed by index rather than by the names in
+`map/continent.txt`; see the note below.)*
+2. **Find it.** The search box matches name, id or owner.
+3. **Style it.** Fill colour, an optional outline with its own colour, and a max
+   dimension (16–2048 px). The preview re-renders on every change, and the
+   status line tells you the output size and the source size in map pixels.
+4. **Options that change what gets built:**
+   - **Include cored states (formables)**: countries only. Adds states merely
+     *cored* by the tag, so a formable nation that owns nothing at game start
+     still has a shape.
+   - **Combine multiple states**: states only. Tick several and render their
+     union as one shape under a region name of your choosing.
+   - **Clickable**: emits a button with a click effect rather than a plain icon.
+   - **Scaffold state-scoped checks**: writes the state-scope trigger boilerplate
+     so the button can test what it is pointing at.
+   - **Divide into clickable states**: countries and continents. Every
+     constituent state becomes its own piece at one shared scale, composed back
+     into the whole shape, so the map is clickable per state rather than as one
+     blob.
+5. **Save PNG + Add to GUI.** The image is written under `gfx/interface/`, the
+   `.gfx` entry is generated, and the element lands on the canvas already wired.
+
+> **Note on continent names.** The list shows `Continent 1` … `Continent 7`
+> rather than the names in `map/continent.txt` (`europe`, `north_america`,
+> `south_america`, `australia`, `africa`, `asia`, `middle_east`, in that
+> order, so the index maps straight onto them). The map loader synthesises the
+> labels from the continent index on each province and does not read
+> `continent.txt`.
+
+### How-to: a modal sub-window
+
+Select the button that should open it and press **+ Modal Window** to get the
+panel, the `opens_menu` wiring and its own canvas tab. Or drag the amber dot on a
+selected button onto a container to make that container its target. Turn on the
+**Links** overlay to see the wiring: dashed amber for *opens sub-menu / modal*,
+pink for *grid stamps this template*, dotted for containment.
+
+### How-to: attach to a vanilla window
+
+Set **Parent Window Token** in Properties to the vanilla window you are
+attaching to, then press **Show Parent Backdrop**. With `hoi4.gamePath` set, the
+actual vanilla window renders behind your canvas from your install (real
+decoded textures), so you position against the real UI instead of guessing.
+
+### How-to: hook it to a decision
+
+Set **Decision Category** in Properties and press **Set up** (a new category) or
+**In panel** (an existing one). Export adds the `scripted_gui = ` line to the
+category for you.
+
+### How-to: round-trip an existing GUI
+
+Press **Import** and pick a `.gui` file. The creator also finds the matching
+`common/scripted_guis` block by `window_name` and puts everything back on the
+right elements: effects, triggers, properties, dynamic lists, context type,
+parent window token, visible, dirty, `ai_enabled`. Entries that match no element
+are preserved and re-emitted rather than dropped.
+
+Export writes back surgically. A same-named window is replaced **in place**
+inside the existing `.gui` file (other windows, comments and headers untouched),
+and the `scripted_gui` entry is replaced by name in its original file, including
+across renames.
+
+### Doing the same from an AI assistant
+
+Everything above is also 35 `gui_*` MCP tools, so an assistant can work on your
+GUI without you describing the canvas to it. The element-level ones:
+
+| Tool | What it does |
+|---|---|
+| `gui_set_element` | Patch one element or many: position, size, sprite, text, parent, any binding, any raw `.gui` key via `extra` (`null` removes a key). A `set.type` on an unknown name creates it. |
+| `gui_move_elements` | Move a selection by `dx/dy`, align it, distribute it with an even or fixed gap, or lay it out on a grid |
+| `gui_clone_element` | Duplicate an element and its children `count` times, stepping by `dx/dy` and substituting `{i}` in names *and* cloned scripts, so one call turns a row template into rows 1..N |
+| `gui_delete_element` | Remove the subtree and its `scripted_gui` blocks |
+| `gui_set_effect` | Bind `click`, `right_click`, `enabled`, `visible` or `property`: derives the block name, refuses bindings the game never reads (a click effect on an `iconType`), refuses unbalanced braces |
+| `gui_rename` | Rename an element with every reference to it, or a whole GUI with its window, entry, `window_name`, `<name>_title` key, decision categories and file |
+| `gui_delete_gui` | Remove a GUI across all four files; defaults to `dry_run: true` |
+| `gui_variables` | Audit every variable, array and flag the GUI reads or writes, and find the read with no writer anywhere, the list nobody fills, the flag checked but never set |
+| `gui_override_vanilla` / `gui_diff_vanilla` | Copy a vanilla window into the mod, then report every override field-by-field and whether a patch made the game's copy newer than yours |
+| `gui_make_sprite` / `gui_sprite_usage` | Write an uncompressed DDS plus its `.gfx` entry from a PNG (frame strips supported); audit sprites nothing references and textures that are missing |
+
+These refuse only the errors *your edit introduces*, so a hand-written window
+that already trips warnings can still be edited, and a refused edit leaves every
+file untouched.
+
+Details: [`docs/GUI_EDIT.md`](vsix-extracted/extension/docs/GUI_EDIT.md).
 
 ---
 
@@ -916,6 +1181,130 @@ Find everywhere something is used.
 
 ---
 
+## Map Tools
+
+78 map tools, all operating on the mod's real files (`provinces.bmp`,
+`definition.csv`, `heightmap.bmp`, the state and strategic-region files), with a
+backup before every write and a `dry_run` on anything destructive.
+
+### Making a map
+
+Paint a province and make it playable: `map_create_provinces` and
+`map_create_province_chain` mint ids, colours and definition rows; `map_paint`
+edits the bitmap with an erase guard so a province can never be silently
+deleted; `map_auto_states` and `map_auto_regions` group provinces; and
+`map_generate_positions`, `map_generate_unitstacks`, `map_generate_buildings`,
+`map_generate_railways`, `map_generate_adjacencies` and
+`map_generate_world_normal` produce everything downstream of the raster.
+
+### Reshaping one
+
+- **Provinces**: `map_split_province`, `map_merge_provinces`, `map_grow_province`,
+  `map_move_border`, `map_reshape_province`, `map_fix_contiguity`
+- **States**: `map_split_state`, `map_merge_states`, `map_grow_state`,
+  `map_rebalance_states`
+- **Locations**: `map_move_location` and `map_relocate_after_edit` for anchors,
+  airports and rocket sites
+- **Canvas**: `map_resize_canvas` (extend or crop, coordinates shifted),
+  `map_scale` (one uniform factor), `map_stretch` (independent x and y, with
+  `preserve_area` to change the aspect ratio at constant pixel count)
+
+### Reprojecting one
+
+`map_reproject` warps every bitmap layer *and* every pixel coordinate in
+adjacencies, positions, buildings and unitstacks from one cylindrical projection
+to another: Miller, equirectangular, Mercator, Web Mercator, Gall stereographic,
+central cylindrical, and four cylindrical equal-area variants. Nearest-neighbour
+on provinces and indexed layers so colours and palettes survive, bilinear on the
+heightmap, each layer at its own resolution. About 345 ms for all seven layers of
+a 5632×2048 map.
+
+`map_fit_projection` tells you what your map already is: give it four or more
+control points with real lat/lon and it least-squares-fits every candidate. It
+is honest about what it cannot resolve: every cylindrical projection puts x
+linear in longitude, and the four equal-area variants are the same curve up to a
+constant, so it reports a *family* rather than inventing a winner.
+
+### Sea and naval
+
+`map_ocean_check`, `map_place_ports`, `map_auto_naval_terrain`,
+`map_shape_seabed`, `map_tile_ocean`, `map_make_lakes`, `map_add_canal`,
+`map_naval_reach`.
+
+Details: [`docs/MAP_MAKING.md`](vsix-extracted/extension/docs/MAP_MAKING.md),
+[`MAP_RASTER.md`](vsix-extracted/extension/docs/MAP_RASTER.md),
+[`MAP_RESIZE.md`](vsix-extracted/extension/docs/MAP_RESIZE.md),
+[`MAP_SEA.md`](vsix-extracted/extension/docs/MAP_SEA.md),
+[`MAP_PROJECTION.md`](vsix-extracted/extension/docs/MAP_PROJECTION.md).
+
+---
+
+## HOI4 Git
+
+**HOI4 Git: Open** (`Ctrl+Alt+G`) is a source-control workbench built for mod
+teams, so nobody has to explain a 4,000-line `states` diff in a Discord thread.
+
+**Desktop parity.** Changes with per-file, per-hunk *and per-line* staging,
+commit box with amend / sign-off / co-authors, History with a lane graph,
+branches, stashes, tags, remotes, fetch/pull/push, clone, `.gitignore` template.
+
+**Beyond it.** GitHub sign-in through VS Code (PRs, issues, check runs, Actions),
+an interactive rebase editor you drag to reorder, reflog undo, a bisect stepper,
+worktrees, submodules, Git LFS tracking for `.dds/.tga/.ogg`, publish repository.
+
+**HOI4-specific.** Semantic diffs that read like the change you actually made:
+`owner GER → POL`, `+focus POL_c`, `moved (1,1)→(3,1)`, `~key: "A" → "B"`, for
+states, focus trees, events, decisions, ideas, country history, localisation,
+sprites and images. A **File Graph** tab showing files as nodes and HOI4
+references as edges, so you can stage a whole feature cluster. A validation gate
+before commit: braces, BOM, conflict markers, missing loc keys, unknown focus
+prerequisites, state sanity, upside-down flags. **Structural 3-way merge** of
+Clausewitz files by block, installable as a git merge driver. "Blame mod object"
+for a state, focus, event or loc key. And a one-click **release**: descriptor
+version bump → commit → tag → zip → optional GitHub release and push.
+
+**The diff viewer** does word-level diffing tuned for Clausewitz tokens
+(`add_core_of={GER}` splits on the braces and the operator), side-by-side view,
+folded runs of unchanged lines, a filter box over paths and semantic summaries,
+and keyboard navigation (`j`/`k` files, `s` stage, `u` unstage, `o` open,
+`t` tree, `v` split, `/` filter).
+
+Design of record: [`docs/GIT_PLAN.md`](vsix-extracted/extension/docs/GIT_PLAN.md).
+
+---
+
+## AI Assistant Support (MCP)
+
+The extension ships an MCP server exposing **236 tools** over stdio, so an AI
+assistant works on your mod through the same code paths the panels use, not by
+guessing at file formats.
+
+| Family | Tools | What it covers |
+|---|---:|---|
+| `git_*` | 84 | Every HOI4 Git panel operation, generated from one operation table |
+| `map_*` | 78 | Rasters, map-making, sea, resize, reprojection |
+| `gui_*` | 35 | Scripted GUI read, write, element edits, sprites, vanilla overrides |
+| `script_*` | 20 | Structured Clausewitz editing: select and patch nodes, no throwaway regex |
+| `loc_*` | 6 | Read, search, validate and write localisation |
+| `focus_*` | 6 | Focus tree reading and editing |
+| `event_*` | 4 | Event reading and editing |
+| `mod_*`, `game_*` | 3 | Mod structure, file access, game log analysis |
+
+Every family can be switched off with an environment variable
+(`HOI4_MCP_GIT_TOOLS=0`, `HOI4_MCP_MAP_*`, `HOI4_MCP_GUI_EDIT_TOOLS=0`,
+`HOI4_MCP_PROJECT_TOOLS=0` and so on) if you want a smaller tool surface.
+
+**Structured script editing** deserves a mention on its own. `script_*` tools
+parse Clausewitz properly and edit by selector (`state/history/buildings/1234`),
+so an assistant changes the node you meant and leaves the file's comments,
+formatting and sibling blocks alone. See
+[`docs/SCRIPT_EDIT.md`](vsix-extracted/extension/docs/SCRIPT_EDIT.md).
+
+**Safety.** Destructive tools take `dry_run`, write a backup first, and return
+`{error}` rather than throwing: a refused operation writes nothing.
+
+---
+
 ## Keyboard Shortcuts
 
 | Shortcut | Action |
@@ -1034,10 +1423,21 @@ your-mod/
 
 ---
 
+## Contributing
+
+Issues and pull requests are welcome at
+[OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC](https://github.com/OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC).
+
 ### Reporting Issues
 
-1. Message awesome___. aka Olander on Discord
+1. [Open a GitHub issue](https://github.com/OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC/issues/new),
+   or
+2. Message **awesome___.** (Olander) on Discord
 
+Include your extension version (the badge above is the current release), your VS
+Code version, and the mod folder layout if the problem is file-related.
+
+---
 
 ## Acknowledgments
 
@@ -1049,7 +1449,7 @@ your-mod/
 
 ## Support
 
-- **Issues:** [GitHub Issues](https://github.com/your-repo/hoi4-modding-tools/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/your-repo/hoi4-modding-tools/discussions)
+- **Issues:** [GitHub Issues](https://github.com/OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/OlanderIAO/HOI4-Modding-Tools-Extension-for-VSC/discussions)
 
 ---
